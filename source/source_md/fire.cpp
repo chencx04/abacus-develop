@@ -179,6 +179,8 @@ void FIRE::check_force(void)
 
 void FIRE::check_fire(void)
 {
+    // FIRE mixes v toward F direction, grows dt when "power" P = sum(v·f) > 0
+    // (moving downhill), shrinks dt and zeros v when P <= 0.
     double P = 0.0;
     double sumforce = 0.0;
     double normvel = 0.0;

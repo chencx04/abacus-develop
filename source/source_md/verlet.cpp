@@ -49,6 +49,9 @@ void Verlet::second_half()
 
 void Verlet::apply_thermostat(void)
 {
+    // Called at end of second_half after the second half-kick with latest forces.
+    // NVE leaves velocities unchanged; other options only rescale or partially
+    // randomize velocities (no additional position update here).
     double t_target = 0.0;
     t_current = MD_func::current_temp(kinetic, ucell.nat, frozen_freedom_, allmass, vel);
 

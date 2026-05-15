@@ -48,6 +48,9 @@ void md_line(UnitCell& unit_in, ModuleESolver::ESolver* p_esolver, const Paramet
     }
 
     /// md cycle, mohan update 2026-01-04, change '<=' to '<'
+    // step_: steps in this run; step_rst_: completed steps from restart file.
+    // step_ == 0: initial energy/force; step_ >= 1: Verlet-like first_half ->
+    // force_virial -> second_half -> stress/temperature.
     while ((mdrun->step_ + mdrun->step_rst_) < param_in.mdp.md_nstep && !mdrun->stop)
     {
         if (mdrun->step_ == 0)

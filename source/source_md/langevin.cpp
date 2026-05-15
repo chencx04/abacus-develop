@@ -85,6 +85,8 @@ void Langevin::restart(const std::string& global_readin_dir)
 
 void Langevin::post_force()
 {
+    // Fluctuation–dissipation: drag -m*v/gamma plus discrete stochastic force
+    // with variance matched to T_target, md_damp (gamma), and md_dt.
     if (my_rank == 0)
     {
         double t_target = MD_func::target_temp(step_ + step_rst_, mdp.md_nstep, md_tfirst, md_tlast);

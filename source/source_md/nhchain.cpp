@@ -214,6 +214,9 @@ void Nose_Hoover::setup(ModuleESolver::ESolver* p_esolver, const std::string& gl
 
 void Nose_Hoover::first_half(std::ofstream& ofs)
 {
+    // NHC + optional NPT: thermostat chain (and barostat chain) updates, then
+    // half kick from ionic forces, two volume half-steps sandwiching position
+    // drift when npt_flag is set (symplectic splitting order matches nhchain design).
     ModuleBase::TITLE("Nose_Hoover", "first_half");
     ModuleBase::timer::start("Nose_Hoover", "first_half");
 
@@ -476,6 +479,8 @@ void Nose_Hoover::restart(const std::string& global_readin_dir)
 
 void Nose_Hoover::particle_thermo()
 {
+    // Yoshida 7-stage integration of Nose–Hoover chain: thermostat velocities
+    // scale ionic velocities via exp(-v_eta[0]*dt/2) accumulated in `scale`.
     /// update mass_eta
     mass_eta[0] = tdof * t_target / md_tfreq / md_tfreq;
     for (int m = 1; m < mdp.md_tchain; ++m)
@@ -561,6 +566,8 @@ void Nose_Hoover::particle_thermo()
 
 void Nose_Hoover::baro_thermo()
 {
+    // Same operator-splitting pattern as particle_thermo, applied to barostat
+    // chain variables (peta / v_peta) and lattice kinetic energy ke_omega.
     /// the freedom of lattice
     int pdof = npt_flag;
 

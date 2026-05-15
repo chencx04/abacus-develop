@@ -78,6 +78,8 @@ void MSST::setup(ModuleESolver::ESolver* p_esolver, const std::string& global_re
 
 void MSST::first_half(std::ofstream& ofs)
 {
+    // Operator split: advance Vdot, temporarily propagate v to update v^2 sum,
+    // then full v propagation, two half volume updates with rescale + r update.
     ModuleBase::TITLE("MSST", "first_half");
     ModuleBase::timer::start("MSST", "first_half");
 

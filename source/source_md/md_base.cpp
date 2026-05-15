@@ -5,6 +5,12 @@
 #endif
 #include "source_io/module_output/print_info.h"
 #include "source_cell/update_cell.h"
+
+// MD_base: shared velocity-Verlet building blocks. One full MD step uses
+// v += 0.5*dt*F/m, r += dt*v (via fractional-coordinate increment pos), then
+// v += 0.5*dt*F/m with the new force. Subclasses may insert thermostats/barostats
+// between these operations.
+
 MD_base::MD_base(const Parameter& param_in, UnitCell& unit_in) 
 : mdp(param_in.mdp), ucell(unit_in)
 {
@@ -94,6 +100,8 @@ void MD_base::second_half()
 
 void MD_base::update_pos()
 {
+    // pos[] holds the direct-lattice increment (scaled by lat0) before * GT;
+    // update_pos_taud converts this displacement into updated ionic tau/d.
     if (my_rank == 0)
     {
         for (int i = 0; i < ucell.nat; ++i)
@@ -125,6 +133,7 @@ void MD_base::update_pos()
 
 void MD_base::update_vel(const ModuleBase::Vector3<double>* force)
 {
+    // Half kick: v <- v + (dt/2) * F/m (Hartree atomic units for F, m).
     if (my_rank == 0)
     {
         for (int i = 0; i < ucell.nat; ++i)

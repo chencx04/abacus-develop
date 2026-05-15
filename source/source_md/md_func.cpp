@@ -7,6 +7,7 @@
 namespace MD_func
 {
 
+// Polar Box–Muller: two independent N(0,1) samples per pair; return one per call.
 double gaussrand()
 {
     static double v1=0.0;
@@ -58,6 +59,7 @@ void compute_stress(const UnitCell& unit_in,
                     const ModuleBase::matrix& virial,
                     ModuleBase::matrix& stress)
 {
+    // stress = W/omega + K/omega with K_ij = sum_m m v_i v_j (kinetic tensor).
     if (cal_stress)
     {
         ModuleBase::matrix t_vector;
@@ -110,6 +112,8 @@ void rescale_vel(const int& natom,
                  const int& frozen_freedom,
                  ModuleBase::Vector3<double>* vel)
 {
+    // Scale |v| so that sum_i 0.5*m_i|v_i|^2 = 0.5*(3*natom - frozen_freedom)*T
+    // (classical equipartition for active DOFs).
     double factor = 0.0;
     if (3 * natom == frozen_freedom || temperature == 0)
     {
@@ -135,6 +139,8 @@ void rand_vel(const int& natom,
               const int& my_rank,
               ModuleBase::Vector3<double>* vel)
 {
+    // Maxwell–Boltzmann draws per mobile DOF, remove CM drift along directions
+    // counted in frozen[], then rescale to exact target kinetic energy.
     if (!my_rank)
     {
         double tot_mass = 0;
@@ -252,6 +258,7 @@ void force_virial(ModuleESolver::ESolver* p_esolver,
                   const bool& cal_stress,
                   ModuleBase::matrix& virial)
 {
+    // ESolver uses Ry internally for energies/forces in typical paths; MD uses Ha.
     ModuleBase::TITLE("MD_func", "force_virial");
     ModuleBase::timer::start("MD_func", "force_virial");
 

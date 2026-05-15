@@ -61,6 +61,14 @@ list(APPEND depend_files
   ../../source_cell/sep_cell.cpp
 )
 
+list(APPEND depend_files_dp ${depend_files})
+list(REMOVE_ITEM depend_files_dp "../../source_esolver/esolver_lj.cpp")
+list(APPEND depend_files_dp "../../source_esolver/esolver_dp.cpp")
+
+list(APPEND depend_files_nep ${depend_files})
+list(REMOVE_ITEM depend_files_nep "../../source_esolver/esolver_lj.cpp")
+list(APPEND depend_files_nep "../../source_esolver/esolver_nep.cpp")
+
 AddTest(
   TARGET MODULE_MD_LJ_pot
   LIBS parameter ${math_libs} psi device
@@ -122,3 +130,30 @@ AddTest(
   ../langevin.cpp
   ${depend_files}
 )
+
+if(DEFINED DeePMD_DIR)
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/../../source_esolver/test/support/case_1.pb"
+       DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+  if(DeePMDC_FOUND)
+    set(_abacus_deepmd_lib DeePMD::deepmd_c)
+  else()
+    set(_abacus_deepmd_lib DeePMD::deepmd_cc)
+  endif()
+  AddTest(
+    TARGET MODULE_MD_dp_mdfunc
+    LIBS parameter ${math_libs} psi device ${_abacus_deepmd_lib}
+    SOURCES md_dp_mdfunc_test.cpp
+    ${depend_files_dp}
+  )
+endif()
+
+if(DEFINED NEP_DIR AND NEP_FOUND)
+  string(REPLACE "\\" "/" _abacus_repo_root "${CMAKE_SOURCE_DIR}")
+  AddTest(
+    TARGET MODULE_MD_nep_mdfunc
+    LIBS parameter ${math_libs} psi device NEP::nep
+    SOURCES md_nep_mdfunc_test.cpp
+    ${depend_files_nep}
+  )
+  target_compile_definitions(MODULE_MD_nep_mdfunc PRIVATE "ABACUS_SOURCE_ROOT=\"${_abacus_repo_root}\"")
+endif()
