@@ -2,6 +2,8 @@
 
 本文档说明 ABACUS 中 `source/source_md/` 目录下离子分子动力学（MD）的数学思想、时间积分流程与代码对应关系。物理量默认采用原子单位（a.u.），部分输入量在构造时换算为 a.u.（见各文件中的 `ModuleBase::` 换算因子）。
 
+本文档存储路径：https://github.com/chencx04/abacus-develop/blob/courseHW/source/source_md/ALGORITHMS.md
+
 ---
 
 ## 1. 模块结构与文件职责
